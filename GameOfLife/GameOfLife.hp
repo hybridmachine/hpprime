@@ -74,7 +74,7 @@ BEGIN
 			END;
 
 			Nbrs := CurrentGen({{NbrTlRow,NbrTlCol},{NbrBrRow,NbrBrCol}});
-			NbrCount := ΣLIST(Nbrs)-1; 
+			NbrCount := ΣLIST(Nbrs)-CurrentCell; 
 
 			NextGen(BoardY, BoardX) := 0;	
 
