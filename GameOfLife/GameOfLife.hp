@@ -1,0 +1,66 @@
+// HP Prime program to render John Conway's Game of Life on the screen
+// In this first revision, always starts with an R-Pentomino
+
+// Load the r pentomino in the middle of the matrix
+// Assumes matrix is set to 0's
+LoadRPentomino(CurrentGen)
+BEGIN
+	LOCAL MatSize, MidX, MidY;
+
+	MatSize := SIZE(CurrentGen);
+
+	MidX := CEILING(MatSize(2)/2); // Middle of columns
+	MidY := CEILING(MatSize(1)/2); // Middle of rows
+
+	// Creates the R-pentomino pattern in the matrix middle 
+	//
+	//           **
+	//          **
+	//			 *
+	// Matrices are Row, Col which maps to Y,X
+	CurrentGen(MidY,MidX) := 1;
+	CurrentGen(MidY-1,MidX) := 1;
+	CurrentGen(MidY-1,MidX+1) := 1;
+	CurrentGen(MidY,MidX-1) := 1;
+	CurrentGen(MidY+1,MidX) := 1;
+
+	RETURN(CurrentGen);
+END;
+
+// Implementation of John Conway's game of life
+//  1  Any live cell with two or three live neighbours survives.
+//  2  Any dead cell with three live neighbours becomes a live cell.
+//  3  All other live cells die in the next generation. 
+//     Similarly, all other dead cells stay dead.
+//
+GetNextGeneration(CurrentGen)
+BEGIN
+
+	RETURN(CurrentGen)
+END;
+
+/// MAIN
+EXPORT GameOfLife()
+BEGIN
+   // Size of playing field (square matrix)
+   LOCAL FieldSize;
+ 
+   //TODO load this from a user prompt
+   FieldSize := 25;
+
+   // SIZE X SIZE matrix of current generation 
+   // (this is the generation visible on the screen)
+   LOCAL CurrentGen;
+
+   // SIZE x SIZE matrix of next generation. Once computed
+   // becomes the current generation and then is zeroed out 
+   LOCAL NextGen;
+
+   // Create both  current and next gen matrices as 0 matrices
+   CurrentGen := MAKEMAT(0, FieldSize, FieldSize);
+   NextGen := MAKEMAT(0, FieldSize, FieldSize);
+
+   CurrentGen := LoadRPentomino(CurrentGen);
+   M1 := CurrentGen; // Store in M1 for debugging 
+   RETURN(0);
+END;
