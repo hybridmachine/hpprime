@@ -1,0 +1,24 @@
+// Implementation of Udemy coding challenge 
+// Matrix fourier transform (not the fast fourier transform)
+// Takes a column vector as an argument
+EXPORT FourierTransform(TimeData)
+BEGIN
+	LOCAL sz, FourierM, matSize;
+	LOCAL j,k;
+
+	matSize := size(TimeData);
+	sz := matSize(1);
+    	
+	FourierM := MAKEMAT(0, sz, sz);
+
+	FOR j FROM 1 TO sz DO
+		FOR k FROM 1 to sz DO
+			FourierM(j,k) := (e^((-2*pi*i/sz)))^((j-1)*(k-1));
+		END;
+	END;
+
+	M1 := FourierM; // For Debugging
+
+	
+	RETURN( FourierM * TimeData);
+END;
