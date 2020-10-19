@@ -18,6 +18,12 @@ BEGIN
 	END;
 
 	M1 := FourierM; // For Debugging
+	// For graphing in the single var stats program (use line graph)
+	D1 := MAKELIST(X,X,1,sz);
+	D2 := MAKELIST(RE(M1(X,2)),X,1,sz);
+	D3 := MAKELIST(RE(M1(X,3)),X,1,sz);
+	D4 := MAKELIST(RE(M1(X,4)),X,1,sz);
+	D5 := MAKELIST(RE(M1(X,5)),X,1,sz);
 
 	
 	RETURN( FourierM * TimeData);
