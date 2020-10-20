@@ -5,26 +5,26 @@
 // Assumes matrix is set to 0's
 LoadRPentomino(CurrentGen)
 BEGIN
-	LOCAL MatSize, MidX, MidY;
+  LOCAL MatSize, MidX, MidY;
 
-	MatSize := SIZE(CurrentGen);
+  MatSize := SIZE(CurrentGen);
 
-	MidX := CEILING(MatSize(2)/2); // Middle of columns
-	MidY := CEILING(MatSize(1)/2); // Middle of rows
+  MidX := CEILING(MatSize(2)/2); // Middle of columns
+  MidY := CEILING(MatSize(1)/2); // Middle of rows
 
-	// Creates the R-pentomino pattern in the matrix middle 
-	//
-	//           **
-	//          **
-	//           *
-	// Matrices are Row, Col which maps to Y,X
-	CurrentGen(MidY,MidX) := 1;
-	CurrentGen(MidY-1,MidX) := 1;
-	CurrentGen(MidY-1,MidX+1) := 1;
-	CurrentGen(MidY,MidX-1) := 1;
-	CurrentGen(MidY+1,MidX) := 1;
+  // Creates the R-pentomino pattern in the matrix middle 
+  //
+  //           **
+  //          **
+  //           *
+  // Matrices are Row, Col which maps to Y,X
+  CurrentGen(MidY,MidX) := 1;
+  CurrentGen(MidY-1,MidX) := 1;
+  CurrentGen(MidY-1,MidX+1) := 1;
+  CurrentGen(MidY,MidX-1) := 1;
+  CurrentGen(MidY+1,MidX) := 1;
 
-	RETURN(CurrentGen);
+  RETURN(CurrentGen);
 END;
 
 // Implementation of John Conway's game of life
@@ -35,62 +35,64 @@ END;
 //
 GetNextGeneration(CurrentGen)
 BEGIN
-	LOCAL MatSize;
-	LOCAL BoardX;
-	LOCAL BoardY;
-	LOCAL NextGen;	
-	LOCAL NbrTlRow, NbrTlCol, NbrBrRow, NbrBrCol, Nbrs;
-	LOCAL LiveCellCount;
-	LOCAL CurrentCell;
+  LOCAL MatSize;
+  LOCAL BoardX;
+  LOCAL BoardY;
+  LOCAL NextGen;  
+  LOCAL NbrTlRow, NbrTlCol, NbrBrRow, NbrBrCol, Nbrs, NbrCount;
+  LOCAL LiveCellCount;
+  LOCAL CurrentCell;
 
 
-	MatSize := SIZE(CurrentGen);
-	NextGen := MAKEMAT(0, MatSize(1), MatSize(2));
-	// Simple for loop for now, will optimize later
+  MatSize := SIZE(CurrentGen);
+  NextGen := MAKEMAT(0, MatSize(1), MatSize(2));
+  // Simple for loop for now, will optimize later
 
-	FOR BoardX FROM 1 TO MatSize(2) DO
-		FOR BoardY FROM 1 TO MatSize(1) DO
-			NbrTlRow = BoardY - 1;
-			NbrTlCol = BoardX - 1;
-			NbrBrRow = BoardY + 1;
-			NbrBrCol = BoardY + 1;
-		
-			CurrentCell := CurrentGen(BoardY, BoardX);	
+  FOR BoardX FROM 1 TO MatSize(2) DO
+    FOR BoardY FROM 1 TO MatSize(1) DO
+      NbrTlRow := BoardY - 1;
+      NbrTlCol := BoardX - 1;
+      NbrBrRow := BoardY + 1;
+      NbrBrCol := BoardX + 1;
+    
+      CurrentCell := CurrentGen(BoardY, BoardX);  
 
-			// If we hit the edges in either direction, fix up 
-			// references (assume outer cells are always off
-			IF NbrTlRow == 0 THEN
-				NbrTlRow = 1;
-			END;
-			IF NbrTlCol == 0 THEN
-				NbrTlCol = 1;
-			END;
+      // If we hit the edges in either direction, fix up 
+      // references (assume outer cells are always off
+      IF NbrTlRow == 0 THEN
+        NbrTlRow := 1;
+      END;
+      IF NbrTlCol == 0 THEN
+        NbrTlCol := 1;
+      END;
 
-			IF NbrBrRow > MatSize(1) THEN
-				NbrBrRow = MatSize(1);
-			END;
-			IF NbrBrCol > MatSize(2) THEN
-				NbrBrCol = MatSize(2);
-			END;
+      IF NbrBrRow > MatSize(1) THEN
+        NbrBrRow := MatSize(1);
+      END;
+      IF NbrBrCol > MatSize(2) THEN
+        NbrBrCol := MatSize(2);
+      END;
 
-			Nbrs := CurrentGen({{NbrTlRow,NbrTlCol},{NbrBrRow,NbrBrCol}});
-			NbrCount := ΣLIST(Nbrs)-CurrentCell; 
+     // PRINT("TL Row " + NbrTlRow + " TL Col " + NbrTlCol + " BR Row " + NbrBrRow + " BR Col " + NbrBrCol);
+      Nbrs := CurrentGen({{NbrTlRow,NbrTlCol},{NbrBrRow,NbrBrCol}});
+      NbrCount := ΣLIST(Nbrs)-CurrentCell; 
 
-			NextGen(BoardY, BoardX) := 0;	
+      NextGen(BoardY, BoardX) := 0;  
 
-			IF CurrentCell > 0 THEN
-				IF (NbrCount == 2 OR NbrCount == 3) THEN 
-					NextGen(BoardY, BoardX) := 1;	
-				ELSE
-					NextGen(BoardY, BoardX) := 0;	
-				END;
-			ELSE
-				IF (NbrCount == 3) THEN
-					NextGen(BoardY, BoardX) := 1;
-			END;
-		END;
-	END;
-	RETURN(CurrentGen)
+      IF CurrentCell > 0 THEN
+        IF (NbrCount == 2 OR NbrCount == 3) THEN 
+          NextGen(BoardY, BoardX) := 1;  
+        ELSE
+          NextGen(BoardY, BoardX) := 0;  
+        END;
+      ELSE
+        IF (NbrCount == 3) THEN
+          NextGen(BoardY, BoardX) := 1;
+        END;
+      END;
+    END;
+  END;
+  RETURN(NextGen);
 END;
 
 /// MAIN
@@ -116,5 +118,7 @@ BEGIN
 
    CurrentGen := LoadRPentomino(CurrentGen);
    M1 := CurrentGen; // Store in M1 for debugging 
+   M2 := GetNextGeneration(CurrentGen);
+   M3 := GetNextGeneration(M2);
    RETURN(0);
 END;
