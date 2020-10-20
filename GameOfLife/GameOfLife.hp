@@ -9,7 +9,7 @@ BEGIN
 
   MatSize := SIZE(CurrentGen);
 
-  MidX := CEILING(MatSize(2)/2); // Middle of columns
+  MidX := CEILING(MatSize(2)/2)+10; // Middle of columns
   MidY := CEILING(MatSize(1)/2); // Middle of rows
 
   // Creates the R-pentomino pattern in the matrix middle 
@@ -27,6 +27,31 @@ BEGIN
   RETURN(CurrentGen);
 END;
 
+// Render the pixel matrix on the screen as a grid of squares
+RenderMatrix(CurrentGen)
+BEGIN
+    LOCAL MatSize, BoardX, BoardY, RenderX, RenderY, edgecolor, fillcolor; 
+
+    MatSize := SIZE(CurrentGen);
+    STARTAPP("Function"); // Start function app. The next variables set are graphing app variables and do not exist for apps with no graphing capabilty.
+    STARTVIEW(-1); // set home screen because STARTAPP opens the default view for the app
+     HAngle:=0; AAngle:=0; // set current angle mode
+     Xmin:= 0;  Xmax:= MatSize(2)+1;  Ymin:=0;  Ymax:=MatSize(1)+1; //set default Cartesian window values
+     RECT(); //clear screen
+
+     edgecolor := RGB(255,0,255);
+     fillcolor := RGB(255,0,0);
+     FOR BoardX FROM 1 TO MatSize(2) DO
+        RenderX := Xmax - BoardX;
+        FOR BoardY FROM 1 TO MatSize(1) DO
+            RenderY := Ymax - BoardY;
+            IF CurrentGen(BoardX, BoardY) == 1 THEN
+                 RECT(G0, RenderX - 1, RenderY - 1, RenderX, RenderY, edgecolor, fillcolor);
+            END;
+        END;
+     END;
+END;
+
 // Implementation of John Conway's game of life
 //  1  Any live cell with two or three live neighbours survives.
 //  2  Any dead cell with three live neighbours becomes a live cell.
@@ -42,6 +67,7 @@ BEGIN
   LOCAL NbrTlRow, NbrTlCol, NbrBrRow, NbrBrCol, Nbrs, NbrCount;
   LOCAL LiveCellCount;
   LOCAL CurrentCell;
+
 
 
   MatSize := SIZE(CurrentGen);
@@ -75,7 +101,7 @@ BEGIN
 
      // PRINT("TL Row " + NbrTlRow + " TL Col " + NbrTlCol + " BR Row " + NbrBrRow + " BR Col " + NbrBrCol);
       Nbrs := CurrentGen({{NbrTlRow,NbrTlCol},{NbrBrRow,NbrBrCol}});
-      NbrCount := ΣLIST(Nbrs)-CurrentCell; 
+      NbrCount := SLIST(Nbrs)-CurrentCell; 
 
       NextGen(BoardY, BoardX) := 0;  
 
@@ -100,9 +126,12 @@ EXPORT GameOfLife()
 BEGIN
    // Size of playing field (square matrix)
    LOCAL FieldSize;
- 
+   
+   // Frame counter	
+   LOCAL RenderFrame;
+
    //TODO load this from a user prompt
-   FieldSize := 25;
+   FieldSize := 32;
 
    // SIZE X SIZE matrix of current generation 
    // (this is the generation visible on the screen)
@@ -117,8 +146,13 @@ BEGIN
    NextGen := MAKEMAT(0, FieldSize, FieldSize);
 
    CurrentGen := LoadRPentomino(CurrentGen);
-   M1 := CurrentGen; // Store in M1 for debugging 
-   M2 := GetNextGeneration(CurrentGen);
-   M3 := GetNextGeneration(M2);
+
+   FOR RenderFrame FROM 1 TO 50 DO
+      RenderMatrix(CurrentGen);
+      CurrentGen := GetNextGeneration(CurrentGen);
+      WAIT(0.10);
+   END;
+
+   WAIT();
    RETURN(0);
 END;
