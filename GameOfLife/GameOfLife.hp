@@ -32,24 +32,32 @@ RenderMatrix(CurrentGen)
 BEGIN
     LOCAL MatSize, BoardX, BoardY, RenderX, RenderY, edgecolor, fillcolor; 
 
+    LOCAL BlankCheckSum, SubMatrixOpt;
+
     MatSize := SIZE(CurrentGen);
     HAngle:=0; AAngle:=0; // set current angle mode
      Xmin:= 0;  Xmax:= MatSize(2)+1;  Ymin:=0;  Ymax:=MatSize(1)+1; //set default Cartesian window values
-     //RECT(); //clear screen
-
+     RECT(); //clear screen
+    SUBGROB(G0, G1);  // Copy the clear to G1
      edgecolor := RGB(255,0,255);
      fillcolor := RGB(255,0,0);
      FOR BoardX FROM 1 TO MatSize(2) DO
+        // Scan for a blank group of columns and skip them (optimization to speed up generation calculation, if they are all blank, they will stay blank)
+        SubMatrixOpt  := CurrentGen({{1,BoardX},{MatSize(1),BoardX}});
+        BlankCheckSum := SLIST(SubMatrixOpt);
+
+        IF BlankCheckSum == 0 THEN
+            CONTINUE;
+        END;
         RenderX := Xmax - BoardX;
         FOR BoardY FROM 1 TO MatSize(1) DO
             RenderY := Ymax - BoardY;
             IF CurrentGen(BoardY, BoardX) == 1 THEN
-                 RECT(G0, RenderX - 1, RenderY - 1, RenderX, RenderY, edgecolor, fillcolor);
-            ELSE
-                 RECT(G0, RenderX - 1, RenderY - 1, RenderX, RenderY, RGB(255,255,255), RGB(255,255,255)); 
-            END;
+                 RECT(G1, RenderX - 1, RenderY - 1, RenderX, RenderY, edgecolor, fillcolor);
+           END;
         END;
      END;
+     BLIT(G1);
 END;
 
 // Implementation of John Conway's game of life
@@ -92,8 +100,7 @@ BEGIN
       FOR BoardY FROM 1 TO MatSize(1) DO
         NbrTlRow := BoardY - 1;
         NbrBrRow := BoardY + 1;
-    
-        CurrentCell := CurrentGen(BoardY, BoardX);  
+        
 
         // If we hit the edges in either direction, fix up 
         // references (assume outer cells are always off
@@ -104,22 +111,29 @@ BEGIN
         IF NbrBrRow > MatSize(1) THEN
           NbrBrRow := MatSize(1);
         END;
+        
 
-        // PRINT("TL Row " + NbrTlRow + " TL Col " + NbrTlCol + " BR Row " + NbrBrRow + " BR Col " + NbrBrCol);
-        Nbrs := CurrentGen({{NbrTlRow,NbrTlCol},{NbrBrRow,NbrBrCol}});
-        NbrCount := SLIST(Nbrs)-CurrentCell; 
+        SubMatrixOpt  := CurrentGen({{NbrTlRow,1},{NbrBrRow, MatSize(2)}});
+        BlankCheckSum := SLIST(SubMatrixOpt);  
+        IF BlankCheckSum > 0 THEN  
+          CurrentCell := CurrentGen(BoardY, BoardX);  
 
-        NextGen(BoardY, BoardX) := 0;  
+          //PRINT("TL Row " + NbrTlRow + " TL Col " + NbrTlCol + " BR Row " + NbrBrRow + " BR Col " + NbrBrCol);
+          Nbrs := CurrentGen({{NbrTlRow,NbrTlCol},{NbrBrRow,NbrBrCol}});
+          NbrCount := SLIST(Nbrs)-CurrentCell; 
 
-        IF CurrentCell > 0 THEN
-          IF (NbrCount == 2 OR NbrCount == 3) THEN 
-            NextGen(BoardY, BoardX) := 1;  
+          NextGen(BoardY, BoardX) := 0;  
+
+          IF CurrentCell > 0 THEN
+            IF (NbrCount == 2 OR NbrCount == 3) THEN 
+              NextGen(BoardY, BoardX) := 1;  
+            ELSE
+              NextGen(BoardY, BoardX) := 0;  
+            END;
           ELSE
-            NextGen(BoardY, BoardX) := 0;  
-          END;
-        ELSE
-          IF (NbrCount == 3) THEN
-            NextGen(BoardY, BoardX) := 1;
+            IF (NbrCount == 3) THEN
+              NextGen(BoardY, BoardX) := 1;
+            END;
           END;
         END;
       END;
