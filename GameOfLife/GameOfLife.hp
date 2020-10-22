@@ -49,7 +49,7 @@ BEGIN
         IF BlankCheckSum == 0 THEN
             CONTINUE;
         END;
-        RenderX := Xmax - BoardX;
+        RenderX := BoardX;
         FOR BoardY FROM 1 TO MatSize(1) DO
             RenderY := Ymax - BoardY;
             IF CurrentGen(BoardY, BoardX) == 1 THEN
@@ -177,7 +177,9 @@ BEGIN
    FOR RenderFrame FROM 1 TO 50 DO
       RenderMatrix(CurrentGen);
       CurrentGen := GetNextGeneration(CurrentGen);
-      WAIT(0.05);
+      WHILE GETKEY == -1 DO
+        WAIT(0.10);
+      END;
    END;
 
    WAIT();
