@@ -1,28 +1,39 @@
 // HP Prime program to render John Conway's Game of Life on the screen
 // In this first revision, always starts with an R-Pentomino
 
+// Copy the pattern matrix into the initial generation
+LoadStartingPattern(CurrentGen, PatternMatrix)
+BEGIN
+   LOCAL MatSize, MidX, MidY, xPos, yPos;
+   LOCAL PatSize;
+
+   MatSize := SIZE(CurrentGen);
+   PatSize := SIZE(PatternMatrix);
+
+  MidX := CEILING(MatSize(2)/2 - PatSize(2)/2); // Middle of columns
+  MidY := CEILING(MatSize(1)/2 - PatSize(1)/2); // Middle of rows
+  
+   FOR xPos  FROM 1 TO PatSize(2) DO
+       FOR yPos FROM 1 TO PatSize(1) DO
+          CurrentGen(MidY + yPos, MidX + xPos) := PatternMatrix(yPos, xPos);
+       END;
+   END;
+
+   Return(CurrentGen);
+END;
+
 // Load the r pentomino in the middle of the matrix
 // Assumes matrix is set to 0's
 LoadRPentomino(CurrentGen)
 BEGIN
   LOCAL MatSize, MidX, MidY;
-
+  LOCAL PatternMatrix;
   MatSize := SIZE(CurrentGen);
 
   MidX := CEILING(MatSize(2)/2); // Middle of columns
   MidY := CEILING(MatSize(1)/2); // Middle of rows
-
-  // Creates the R-pentomino pattern in the matrix middle 
-  //
-  //           **
-  //          **
-  //           *
-  // Matrices are Row, Col which maps to Y,X
-  CurrentGen(MidY,MidX) := 1;
-  CurrentGen(MidY-1,MidX) := 1;
-  CurrentGen(MidY-1,MidX+1) := 1;
-  CurrentGen(MidY,MidX-1) := 1;
-  CurrentGen(MidY+1,MidX) := 1;
+  PatternMatrix := [[0,1,1],[1,1,0],[0,1,0]];
+  CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
 
   RETURN(CurrentGen);
 END;
