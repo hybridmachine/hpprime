@@ -26,13 +26,18 @@ END;
 // Assumes matrix is set to 0's
 LoadRPentomino(CurrentGen)
 BEGIN
-  LOCAL MatSize, MidX, MidY;
   LOCAL PatternMatrix;
-  MatSize := SIZE(CurrentGen);
-
-  MidX := CEILING(MatSize(2)/2); // Middle of columns
-  MidY := CEILING(MatSize(1)/2); // Middle of rows
   PatternMatrix := [[0,1,1],[1,1,0],[0,1,0]];
+  CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
+
+  RETURN(CurrentGen);
+END;
+
+// Load a glider pattern
+LoadGlider(CurrentGen)
+BEGIN
+  LOCAL PatternMatrix;
+  PatternMatrix := [[0,1,0],[0,0,1],[1,1,1]];
   CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
 
   RETURN(CurrentGen);
@@ -179,8 +184,8 @@ BEGIN
    CurrentGen := MAKEMAT(0, FieldSize, FieldSize);
    NextGen := MAKEMAT(0, FieldSize, FieldSize);
 
-   CurrentGen := LoadRPentomino(CurrentGen);
- 
+//   CurrentGen := LoadRPentomino(CurrentGen);
+   CurrentGen := LoadGlider(CurrentGen);
    STARTAPP("Function"); // Start function app. The next variables set are graphing app variables and do not exist for apps with no graphing capabilty.
    STARTVIEW(-1); // set home screen because STARTAPP opens the default view for the app
    RECT();
