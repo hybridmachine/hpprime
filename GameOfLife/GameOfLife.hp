@@ -27,7 +27,9 @@ END;
 LoadRPentomino(CurrentGen)
 BEGIN
   LOCAL PatternMatrix;
-  PatternMatrix := [[0,1,1],[1,1,0],[0,1,0]];
+  PatternMatrix := [[0,1,1],
+                                  [1,1,0],
+                                  [0,1,0]];
   CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
 
   RETURN(CurrentGen);
@@ -37,9 +39,26 @@ END;
 LoadGlider(CurrentGen)
 BEGIN
   LOCAL PatternMatrix;
-  PatternMatrix := [[0,1,0],[0,0,1],[1,1,1]];
+  PatternMatrix := [[0,1,0],
+                                  [0,0,1],
+                                  [1,1,1]];
   CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
 
+  RETURN(CurrentGen);
+END;
+
+// Load a glider pattern
+LoadGliderBlockCycle(CurrentGen)
+BEGIN
+  LOCAL PatternMatrix;
+  PatternMatrix := [[0,0,0,1,1,0,0,0],
+                                  [0,0,0,1,1,0,0,0],
+                                  [0,0,0,0,0,0,0,0],
+                                  [0,0,0,0,0,0,0,0],
+                                  [0,0,1,0,0,1,0,0],
+                                  [1,0,1,0,0,1,0,1],
+                                  [0,1,1,0,0,1,1,0]];
+  CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
   RETURN(CurrentGen);
 END;
 
@@ -184,8 +203,10 @@ BEGIN
    CurrentGen := MAKEMAT(0, FieldSize, FieldSize);
    NextGen := MAKEMAT(0, FieldSize, FieldSize);
 
-//   CurrentGen := LoadRPentomino(CurrentGen);
-   CurrentGen := LoadGlider(CurrentGen);
+  //   CurrentGen := LoadRPentomino(CurrentGen);
+  //   CurrentGen := LoadGlider(CurrentGen);
+   CurrentGen := LoadGliderBlockCycle(CurrentGen);
+
    STARTAPP("Function"); // Start function app. The next variables set are graphing app variables and do not exist for apps with no graphing capabilty.
    STARTVIEW(-1); // set home screen because STARTAPP opens the default view for the app
    RECT();
