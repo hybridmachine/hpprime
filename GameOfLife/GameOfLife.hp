@@ -198,15 +198,20 @@ BEGIN
    // SIZE x SIZE matrix of next generation. Once computed
    // becomes the current generation and then is zeroed out 
    LOCAL NextGen;
+   LOCAL InitialPatternIdx;
 
    // Create both  current and next gen matrices as 0 matrices
    CurrentGen := MAKEMAT(0, FieldSize, FieldSize);
    NextGen := MAKEMAT(0, FieldSize, FieldSize);
-
-  //   CurrentGen := LoadRPentomino(CurrentGen);
-  //   CurrentGen := LoadGlider(CurrentGen);
-   CurrentGen := LoadGliderBlockCycle(CurrentGen);
-
+   CHOOSE(InitialPatternIdx, "Choose an initial pattern", "r-pentomino", "glider", "glider block cycle");
+ 
+   CASE 
+     IF (InitialPatternIdx = 1) THEN CurrentGen := LoadRPentomino(CurrentGen); END;
+     IF (InitialPatternIdx = 2) THEN CurrentGen := LoadGlider(CurrentGen); END;
+     IF (InitialPatternIdx = 3) THEN CurrentGen := LoadGliderBlockCycle(CurrentGen);  END;
+     DEFAULT RETURN(-1);
+   END;
+ 
    STARTAPP("Function"); // Start function app. The next variables set are graphing app variables and do not exist for apps with no graphing capabilty.
    STARTVIEW(-1); // set home screen because STARTAPP opens the default view for the app
    RECT();
