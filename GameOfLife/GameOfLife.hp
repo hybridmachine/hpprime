@@ -72,8 +72,8 @@ BEGIN
     MatSize := SIZE(CurrentGen);
     HAngle:=0; AAngle:=0; // set current angle mode
      Xmin:= 0;  Xmax:= MatSize(2)+1;  Ymin:=0;  Ymax:=MatSize(1)+1; //set default Cartesian window values
-     RECT(); //clear screen
-    SUBGROB(G0, G1);  // Copy the clear to G1
+     RECT(G1); //clear screen
+    //SUBGROB(G0, G1);  // Copy the clear to G1
      edgecolor := RGB(255,0,255);
      fillcolor := RGB(255,0,0);
      FOR BoardX FROM 1 TO MatSize(2) DO
@@ -204,7 +204,8 @@ BEGIN
    CurrentGen := MAKEMAT(0, FieldSize, FieldSize);
    NextGen := MAKEMAT(0, FieldSize, FieldSize);
    CHOOSE(InitialPatternIdx, "Choose an initial pattern", "r-pentomino", "glider", "glider block cycle");
- 
+  
+   
    CASE 
      IF (InitialPatternIdx = 1) THEN CurrentGen := LoadRPentomino(CurrentGen); END;
      IF (InitialPatternIdx = 2) THEN CurrentGen := LoadGlider(CurrentGen); END;
@@ -219,9 +220,9 @@ BEGIN
    FOR RenderFrame FROM 1 TO 50 DO
       RenderMatrix(CurrentGen);
       CurrentGen := GetNextGeneration(CurrentGen);
-      WHILE GETKEY == -1 DO
+     // WHILE GETKEY == -1 DO
         WAIT(0.10);
-      END;
+     // END;
    END;
 
    WAIT();
