@@ -79,7 +79,7 @@ BEGIN
      FOR BoardX FROM 1 TO MatSize(2) DO
         // Scan for a blank group of columns and skip them (optimization to speed up generation calculation, if they are all blank, they will stay blank)
         SubMatrixOpt  := CurrentGen({{1,BoardX},{MatSize(1),BoardX}});
-        BlankCheckSum := SLIST(SubMatrixOpt);
+        BlankCheckSum := ΣLIST(SubMatrixOpt);
 
         IF BlankCheckSum == 0 THEN
             CONTINUE;
@@ -130,7 +130,7 @@ BEGIN
 
     // Scan for a blank group of columns and skip them (optimization to speed up generation calculation, if they are all blank, they will stay blank)
     SubMatrixOpt  := CurrentGen({{1,NbrTlCol},{MatSize(1),NbrBrCol}});
-    BlankCheckSum := SLIST(SubMatrixOpt);  
+    BlankCheckSum := ΣLIST(SubMatrixOpt);  
     IF BlankCheckSum > 0 THEN  
       FOR BoardY FROM 1 TO MatSize(1) DO
         NbrTlRow := BoardY - 1;
@@ -149,13 +149,13 @@ BEGIN
         
 
         SubMatrixOpt  := CurrentGen({{NbrTlRow,1},{NbrBrRow, MatSize(2)}});
-        BlankCheckSum := SLIST(SubMatrixOpt);  
+        BlankCheckSum := ΣLIST(SubMatrixOpt);  
         IF BlankCheckSum > 0 THEN  
           CurrentCell := CurrentGen(BoardY, BoardX);  
 
           //PRINT("TL Row " + NbrTlRow + " TL Col " + NbrTlCol + " BR Row " + NbrBrRow + " BR Col " + NbrBrCol);
           Nbrs := CurrentGen({{NbrTlRow,NbrTlCol},{NbrBrRow,NbrBrCol}});
-          NbrCount := SLIST(Nbrs)-CurrentCell; 
+          NbrCount := ΣLIST(Nbrs)-CurrentCell; 
 
           NextGen(BoardY, BoardX) := 0;  
 
