@@ -1,8 +1,16 @@
 // HP Prime program to render John Conway's Game of Life on the screen
 // In this first revision, always starts with an R-Pentomino
 
+// SIZE X SIZE matrix of current generation 
+// (this is the generation visible on the screen)
+EXPORT CurrentGen;
+
+// SIZE x SIZE matrix of next generation. Once computed
+// becomes the current generation and then is zeroed out
+EXPORT NextGen;
+
 // Copy the pattern matrix into the initial generation
-LoadStartingPattern(CurrentGen, PatternMatrix)
+LoadStartingPattern(PatternMatrix)
 BEGIN
    LOCAL MatSize, MidX, MidY, xPos, yPos;
    LOCAL PatSize;
@@ -19,51 +27,51 @@ BEGIN
        END;
    END;
 
-   Return(CurrentGen);
+   Return(0);
 END;
 
 // Load the r pentomino in the middle of the matrix
 // Assumes matrix is set to 0's
-LoadRPentomino(CurrentGen)
+LoadRPentomino()
 BEGIN
   LOCAL PatternMatrix;
   PatternMatrix := [[0,1,1],
-                                  [1,1,0],
-                                  [0,1,0]];
-  CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
+                    [1,1,0],
+                    [0,1,0]];
+  LoadStartingPattern(PatternMatrix);
 
-  RETURN(CurrentGen);
+  RETURN(0);
 END;
 
 // Load a glider pattern
-LoadGlider(CurrentGen)
+LoadGlider()
 BEGIN
   LOCAL PatternMatrix;
   PatternMatrix := [[0,1,0],
-                                  [0,0,1],
-                                  [1,1,1]];
-  CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
+                    [0,0,1],
+                    [1,1,1]];
+  LoadStartingPattern(PatternMatrix);
 
-  RETURN(CurrentGen);
+  RETURN(0);
 END;
 
 // Load a glider pattern
-LoadGliderBlockCycle(CurrentGen)
+LoadGliderBlockCycle()
 BEGIN
   LOCAL PatternMatrix;
   PatternMatrix := [[0,0,0,1,1,0,0,0],
-                                  [0,0,0,1,1,0,0,0],
-                                  [0,0,0,0,0,0,0,0],
-                                  [0,0,0,0,0,0,0,0],
-                                  [0,0,1,0,0,1,0,0],
-                                  [1,0,1,0,0,1,0,1],
-                                  [0,1,1,0,0,1,1,0]];
-  CurrentGen := LoadStartingPattern(CurrentGen, PatternMatrix);
-  RETURN(CurrentGen);
+                    [0,0,0,1,1,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,1,0,0,1,0,0],
+                    [1,0,1,0,0,1,0,1],
+                    [0,1,1,0,0,1,1,0]];
+  LoadStartingPattern(PatternMatrix);
+  RETURN(0);
 END;
 
 // Render the pixel matrix on the screen as a grid of squares
-RenderMatrix(CurrentGen)
+RenderMatrix()
 BEGIN
     LOCAL MatSize, BoardX, BoardY, RenderX, RenderY, edgecolor, fillcolor; 
 
@@ -88,11 +96,11 @@ BEGIN
         FOR BoardY FROM 1 TO MatSize(1) DO
             RenderY := Ymax - BoardY;
             IF CurrentGen(BoardY, BoardX) == 1 THEN
-                 RECT(G1, RenderX - 1, RenderY - 1, RenderX, RenderY, edgecolor, fillcolor);
+                  RECT(G1, RenderX - 1, RenderY - 1, RenderX, RenderY, edgecolor, fillcolor);
            END;
         END;
      END;
-     BLIT(G1);
+     BLIT(G0,G1);
 END;
 
 // Implementation of John Conway's game of life
@@ -101,12 +109,11 @@ END;
 //  3  All other live cells die in the next generation. 
 //     Similarly, all other dead cells stay dead.
 //
-GetNextGeneration(CurrentGen)
+GetNextGeneration()
 BEGIN
   LOCAL MatSize;
   LOCAL BoardX;
   LOCAL BoardY;
-  LOCAL NextGen;  
   LOCAL NbrTlRow, NbrTlCol, NbrBrRow, NbrBrCol, Nbrs, NbrCount;
   LOCAL LiveCellCount;
   LOCAL CurrentCell;
@@ -174,8 +181,9 @@ BEGIN
       END;
     END;
   END;
-
-  RETURN(NextGen);
+  
+  CurrentGen := NextGen;
+  RETURN(0);
 END;
 
 /// MAIN
@@ -188,16 +196,8 @@ BEGIN
    LOCAL RenderFrame;
 
    //TODO load this from a user prompt
-   INPUT(FieldSize);
- 
-
-   // SIZE X SIZE matrix of current generation 
-   // (this is the generation visible on the screen)
-   LOCAL CurrentGen;
-
-   // SIZE x SIZE matrix of next generation. Once computed
-   // becomes the current generation and then is zeroed out 
-   LOCAL NextGen;
+   INPUT(FieldSize,"Game board settings", "Edge length of square playing field", "", 50, 50); 
+  
    LOCAL InitialPatternIdx;
 
    // Create both  current and next gen matrices as 0 matrices
@@ -207,19 +207,21 @@ BEGIN
   
    
    CASE 
-     IF (InitialPatternIdx = 1) THEN CurrentGen := LoadRPentomino(CurrentGen); END;
-     IF (InitialPatternIdx = 2) THEN CurrentGen := LoadGlider(CurrentGen); END;
-     IF (InitialPatternIdx = 3) THEN CurrentGen := LoadGliderBlockCycle(CurrentGen);  END;
+     IF (InitialPatternIdx = 1) THEN LoadRPentomino(); END;
+     IF (InitialPatternIdx = 2) THEN LoadGlider(); END;
+     IF (InitialPatternIdx = 3) THEN LoadGliderBlockCycle();  END;
      DEFAULT RETURN(-1);
    END;
  
+   
+
    STARTAPP("Function"); // Start function app. The next variables set are graphing app variables and do not exist for apps with no graphing capabilty.
    STARTVIEW(-1); // set home screen because STARTAPP opens the default view for the app
    RECT();
    
    FOR RenderFrame FROM 1 TO 50 DO
-      RenderMatrix(CurrentGen);
-      CurrentGen := GetNextGeneration(CurrentGen);
+      RenderMatrix();
+      GetNextGeneration();
      // WHILE GETKEY == -1 DO
         WAIT(0.10);
      // END;
