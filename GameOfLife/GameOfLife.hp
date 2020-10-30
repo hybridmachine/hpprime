@@ -1,3 +1,4 @@
+#pragma mode( separator(.,;) integer(h32) )
 // HP Prime program to render John Conway's Game of Life on the screen
 // In this first revision, always starts with an R-Pentomino
 
