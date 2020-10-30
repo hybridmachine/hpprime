@@ -195,6 +195,9 @@ BEGIN
    // Frame counter  
    LOCAL RenderFrame;
 
+   // Setup G1 where we render, then we copy to G0 for display, eliminates blinking
+   DIMGROB(G1, GROBW(G0), GROBH(G0));
+   
    //TODO load this from a user prompt
    INPUT(FieldSize,"Game board settings", "Edge length of square playing field", "", 50, 50); 
   
