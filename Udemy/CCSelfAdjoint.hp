@@ -1,0 +1,26 @@
+// Implementation of Udemy coding challenge for self adjoint
+// This demonstrateds the <Av,w> = <v,Aw> when 3 conditions are met
+// 1 A is square 
+// 2 A is symmetric 
+// 3 v and w row count == A column count
+EXPORT CCSelfAdjoint()
+BEGIN
+  PRINT();
+  LOCAL A,v,w, Av, Aw;
+  LOCAL d1,d2;
+
+  A:= RANDMAT(3,3,25);
+  v := RANDMAT(3,1,25);
+  w := RANDMAT(3,1,25);
+
+  A := TRN(A) * A; // Make A symmetric
+  Av := A*v;
+  Aw := A*w;
+  
+  d1 := DOT(Av(-1),w(-1)); // The (-1) gets the column as list
+  d2 := DOT(v(-1),Aw(-1)); 
+
+  PRINT(d1);
+  PRINT(d2);
+
+END;
