@@ -200,7 +200,7 @@ BEGIN
    DIMGROB(G1, GROBW(G0), GROBH(G0));
    
    //TODO load this from a user prompt
-   INPUT(FieldSize,"Game board settings", "Edge length of square playing field", "", 50, 50); 
+   INPUT(FieldSize,"Game Board Settings", "Side = ", "Enter length of side", 50,50); 
   
    LOCAL InitialPatternIdx;
 
