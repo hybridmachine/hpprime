@@ -10,6 +10,9 @@ EXPORT CurrentGen;
 // becomes the current generation and then is zeroed out
 EXPORT NextGen;
 
+// 1 based generation index , displayed at the top of the screen
+EXPORT GenIdx; 
+
 // Copy the pattern matrix into the initial generation
 LoadStartingPattern(PatternMatrix)
 BEGIN
@@ -83,8 +86,8 @@ BEGIN
      Xmin:= 0;  Xmax:= MatSize(2)+1;  Ymin:=0;  Ymax:=MatSize(1)+1; //set default Cartesian window values
      RECT(G1); //clear screen
     //SUBGROB(G0, G1);  // Copy the clear to G1
-     edgecolor := RGB(255,0,255);
-     fillcolor := RGB(255,0,0);
+     edgecolor := RGB(255,255,0);
+     fillcolor := RGB(0,0,255);
      FOR BoardX FROM 1 TO MatSize(2) DO
         // Scan for a blank group of columns and skip them (optimization to speed up generation calculation, if they are all blank, they will stay blank)
         SubMatrixOpt  := CurrentGen({{1,BoardX},{MatSize(1),BoardX}});
@@ -101,6 +104,9 @@ BEGIN
            END;
         END;
      END;
+
+     // Render which generation is being displayed
+     TEXTOUT_P(GenIdx, G1, 0, 0, 0, RGB(0,255,255,125));
      BLIT(G0,G1);
 END;
 
@@ -184,6 +190,7 @@ BEGIN
   END;
   
   CurrentGen := NextGen;
+  GenIdx := GenIdx + 1;
   RETURN(0);
 END;
 
@@ -191,7 +198,7 @@ END;
 EXPORT GameOfLife()
 BEGIN
    // Size of playing field (square matrix)
-   LOCAL FieldSize;
+   LOCAL FieldSize, NumGens;
    
    // Frame counter  
    LOCAL RenderFrame;
@@ -200,13 +207,15 @@ BEGIN
    DIMGROB(G1, GROBW(G0), GROBH(G0));
    
    //TODO load this from a user prompt
-   INPUT(FieldSize,"Game Board Settings", "Side = ", "Enter length of side", 50,50); 
+   INPUT({FieldSize, NumGens},"Game Board Settings", {"Side = ","Gens = "}, {"Enter length of side","Number of generations"}, {50,50},{50,50}); 
   
    LOCAL InitialPatternIdx;
 
    // Create both  current and next gen matrices as 0 matrices
    CurrentGen := MAKEMAT(0, FieldSize, FieldSize);
    NextGen := MAKEMAT(0, FieldSize, FieldSize);
+   GenIdx := 1;
+
    CHOOSE(InitialPatternIdx, "Choose an initial pattern", "r-pentomino", "glider", "glider block cycle");
   
    
@@ -223,7 +232,7 @@ BEGIN
    STARTVIEW(-1); // set home screen because STARTAPP opens the default view for the app
    RECT();
    
-   FOR RenderFrame FROM 1 TO 50 DO
+   FOR RenderFrame FROM 1 TO NumGens DO
       RenderMatrix();
       GetNextGeneration();
      // WHILE GETKEY == -1 DO
