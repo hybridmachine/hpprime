@@ -84,8 +84,12 @@ BEGIN
     MatSize := SIZE(CurrentGen);
     HAngle:=0; AAngle:=0; // set current angle mode
      Xmin:= 0;  Xmax:= MatSize(2)+1;  Ymin:=0;  Ymax:=MatSize(1)+1; //set default Cartesian window values
+     BLIT(G6,G5);
+     BLIT(G5,G4);
+     BLIT(G4,G3);
+     BLIT(G3,G2);
+     BLIT(G2,G1);
      RECT(G1); //clear screen
-    //SUBGROB(G0, G1);  // Copy the clear to G1
      edgecolor := RGB(255,255,0);
      fillcolor := RGB(0,0,255);
      FOR BoardX FROM 1 TO MatSize(2) DO
@@ -106,8 +110,13 @@ BEGIN
      END;
 
      // Render which generation is being displayed
-     TEXTOUT_P(GenIdx, G1, 0, 0, 0, RGB(0,255,255,125));
+     
      BLIT(G0,G1);
+     //BLIT_P(G0,0,0,GROBW_P(G0),GROBH_P(G0),G4,0,0,GROBW_P(G0),GROBH_P(G0),0,125); // Copy a faded copy of the original generation for a persistance of vision effect
+     BLIT_P(G0,0,0,GROBW_P(G0),GROBH_P(G0),G3,0,0,GROBW_P(G0),GROBH_P(G0),0,120); // Copy a faded copy of the original generation for a persistance of vision effect
+     BLIT_P(G0,0,0,GROBW_P(G0),GROBH_P(G0),G4,0,0,GROBW_P(G0),GROBH_P(G0),0,80); // Copy a faded copy of the original generation for a persistance of vision effect
+     BLIT_P(G0,0,0,GROBW_P(G0),GROBH_P(G0),G6,0,0,GROBW_P(G0),GROBH_P(G0),0,40); // Copy a faded copy of the original generation for a persistance of vision effect
+     TEXTOUT_P(GenIdx, G0, 0, 0, 0, RGB(255,255,0,125));
 END;
 
 // Implementation of John Conway's game of life
@@ -205,7 +214,11 @@ BEGIN
 
    // Setup G1 where we render, then we copy to G0 for display, eliminates blinking
    DIMGROB(G1, GROBW(G0), GROBH(G0));
-   
+   DIMGROB(G2, GROBW(G0), GROBH(G0));
+   DIMGROB(G3, GROBW(G0), GROBH(G0));
+   DIMGROB(G4, GROBW(G0), GROBH(G0));
+   DIMGROB(G5, GROBW(G0), GROBH(G0));
+   DIMGROB(G6, GROBW(G0), GROBH(G0));
    //TODO load this from a user prompt
    INPUT({FieldSize, NumGens},"Game Board Settings", {"Side = ","Gens = "}, {"Enter length of side","Number of generations"}, {50,50},{50,50}); 
   
@@ -232,13 +245,26 @@ BEGIN
    STARTVIEW(-1); // set home screen because STARTAPP opens the default view for the app
    RECT();
    
-   FOR RenderFrame FROM 1 TO NumGens DO
+   FOR RenderFrame FROM 1 TO NumGens-1 DO
       RenderMatrix();
       GetNextGeneration();
      // WHILE GETKEY == -1 DO
         WAIT(0.10);
      // END;
    END;
+
+   //These last renders cause the history tail to fade out, ending with just the last pattern displaying.
+   RenderMatrix();
+   WAIT(0.10);
+   RenderMatrix();
+   WAIT(0.10);
+   RenderMatrix();
+   WAIT(0.10);
+   RenderMatrix();
+   WAIT(0.10);
+   RenderMatrix();
+   WAIT(0.10);
+   RenderMatrix();
 
    WAIT();
    RETURN(0);
