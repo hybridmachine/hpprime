@@ -1,0 +1,26 @@
+#pragma mode( separator(.,;) integer(h64) )
+// This program generates random integer matrix of specified rank with the specified dimensions
+// Maximum rank of multiplied matrices is min {rank(M1), rank(M2)}
+// The rank of a random matrix is generally the maximum rank possible for the matrix
+/// MAIN
+EXPORT MatrixOfRank(Rows, Columns, MatRank)
+BEGIN
+    Local Mat1, Mat2, ResMat;
+
+    Mat1 := RANDMAT(Rows, MatRank);
+    Mat2 := RANDMAT(MatRank, Columns);
+
+    ResMat := Mat1 * Mat2;
+
+    // While a random matrix is almost always full rank, occasionally it will not be, so this
+    // loop will continue until we get the rank requested. This should occur only rarely
+
+    WHILE RANK(ResMat) != MatRank DO
+        Mat1 := RANDMAT(Rows, MatRank);
+        Mat2 := RANDMAT(MatRank, Columns);
+
+        ResMat := Mat1 * Mat2;
+    END;
+
+    RETURN(ResMat);
+END;
