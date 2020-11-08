@@ -3,6 +3,7 @@
 // Maximum rank of multiplied matrices is min {rank(M1), rank(M2)}
 // The rank of a random matrix is generally the maximum rank possible for the matrix
 
+// Shift-User-4
 KEY K_4()
 BEGIN
   RETURN("MatrixOfRank()"); 
