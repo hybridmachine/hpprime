@@ -1,29 +1,40 @@
 // Test program to work out using bit masking to implement the game of life program
 EXPORT BitWisdom()
 BEGIN
-  PRINT();
-  LOCAL TestList, Idx, NbrCnt, Bit;
+    PRINT();
+    LOCAL GenOneList, GenTwoList, Idx, NbrCnt, Bit;
 
-  TestList  := {#0000000000000000b,
-                #0000000000000000b,
-                #0000000110000000b,
-                #0000001100000000b,
-                #0000000100000000b,
-                #0000000000000000b,
-                #0000000000000000b};
-    
-    FOR Idx FROM 2 TO (SIZE(TestList) - 1) DO
+
+    GenOneList  := {#0000000000000000b,
+                    #0000000000000000b,
+                    #0000000110000000b,
+                    #0000001100000000b,
+                    #0000000100000000b,
+                    #0000000000000000b,
+                    #0000000000000000b};
+
+    GenTwoList  := {#0000000000000000b,
+                    #0000000000000000b,
+                    #0000000000000000b,
+                    #0000000000000000b,
+                    #0000000000000000b,
+                    #0000000000000000b,
+                    #0000000000000000b};  
+
+    FOR Idx FROM 2 TO (SIZE(GenOneList) - 1) DO
         LOCAL Row,RowAbove,RowBelow;
-        
-        RowAbove := TestList(Idx-1);
-        Row := TestList(Idx);
-        RowBelow := TestList(Idx+1);
-        
+        LOCAL ColIdx; 
+
+        RowAbove := GenOneList(Idx-1);
+        Row := GenOneList(Idx);
+        RowBelow := GenOneList(Idx+1);
+        ColIdx := 16;
+
         WHILE ((Row > 0) OR (RowAbove > 0) OR (RowBelow > 0)) DO
             NbrCnt := 0;
-            IF (BITAND(Row, #010b) == #010b) THEN
-            // Check if bit stays on
-            LOCAL Above,Here,Below;
+            LOCAL Above,Here,Below, Bit;
+            Bit := #0b;
+
             Above := BITAND(RowAbove, #111b);
             Here := BITAND(Row, #101b); // Don't count the actual bit being checked
             Below := BITAND(RowBelow, #111b);
@@ -34,20 +45,35 @@ BEGIN
                 BITSR(Here);
                 BITSR(Below);
             END;
-            
-            IF 2 <= NbrCnt <= 3 THEN
-                PRINT ("BIT " + Idx + " LIVES");
+
+            IF (BITAND(Row, #010b) == #010b) THEN
+                IF 2 <= NbrCnt <= 3 THEN
+                    //PRINT ("BIT " + Idx + ", " + ColIdx + " LIVES");
+                    Bit := 1;
+                ELSE
+                    //PRINT ("BIT " + Idx + ", " + ColIdx + " DIES");
+                    Bit := 0;
+                END
             ELSE
-                PRINT ("BIT " + Idx + " DIES");
-            END
-            ELSE
-            // Check if bit turns on
+                // Process a bit to see if it turns on
+                // Any dead cell with three live neighbours becomes a live cell.
+                IF 3 == NbrCnt THEN
+                    //PRINT ("BIT " + Idx + ", " + ColIdx + " Activates");
+                    Bit := 1;
+                END
             END; 
-            PRINT("Row " + Idx + " is " + Row);
+            //PRINT("Row " + Idx + " is " + Row);
             
             RowAbove := BITSR(RowAbove);
             Row := BITSR(Row);
             RowBelow := BITSR(RowBelow);
+
+            GenTwoList(Idx) := BITSL(GenTwoList(Idx) + Bit);
+            ColIdx := ColIdx - 1;
         END; // While
     END; // For
+
+    FOR Idx FROM 1 TO (SIZE(GenTwoList)) DO
+        PRINT(SETBASE(GenTwoList(Idx),1));
+    END;
 END; // Begin

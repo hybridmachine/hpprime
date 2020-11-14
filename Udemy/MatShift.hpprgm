@@ -1,0 +1,24 @@
+#pragma mode( separator(.,;) integer(h64) )
+// This program takes a square matrix and shifts it by .01 Identity matrix to increase its rank to full
+
+// Shift-User-5
+KEY K_5()
+BEGIN
+  RETURN("MatShift()"); 
+END;
+
+/// MAIN
+EXPORT MatShift(Mat)
+BEGIN
+    Local ShiftMat, MatSize, RowCnt, ColCnt;
+
+    MatSize := SIZE(Mat);
+    RowCnt := MatSize(1);
+    ColCnt := MatSize(2);
+
+    IF RowCnt == ColCnt THEN
+        ShiftMat := 0.01 * IDENMAT(MatSize(1));
+        RETURN(Mat + ShiftMat);
+    END;
+    RETURN("ERROR: Matrix must be square");
+END;
