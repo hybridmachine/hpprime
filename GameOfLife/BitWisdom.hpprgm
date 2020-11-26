@@ -30,49 +30,53 @@ BEGIN
         RowBelow := GenOneList(Idx+1);
         ColIdx := 16;
 
-        WHILE ((Row > 0) OR (RowAbove > 0) OR (RowBelow > 0)) DO
-            NbrCnt := 0;
-            LOCAL Above,Here,Below, BitIdx;
-            Bit := 0;
+        WHILE (ColIdx > 1) DO
+            IF ((Row > 0) OR (RowAbove > 0) OR (RowBelow > 0)) THEN
+                NbrCnt := 0;
+                LOCAL Above,Here,Below, BitIdx;
+                Bit := 0;
 
-            Above := BITAND(RowAbove, #111b);
-            Here := BITAND(Row, #101b); // Don't count the actual bit being checked
-            Below := BITAND(RowBelow, #111b);
+                Above := BITAND(RowAbove, #111b);
+                Here := BITAND(Row, #101b); // Don't count the actual bit being checked
+                Below := BITAND(RowBelow, #111b);
 
-            FOR BitIdx FROM 1 TO 3 DO
-                NbrCnt := NbrCnt + BITAND(Above, #001b) + BITAND(Here, #001b) + BITAND(Below, #001b);
-                Above := BITSR(Above);
-                Here := BITSR(Here);
-                Below := BITSR(Below);
-            END;
+                FOR BitIdx FROM 1 TO 3 DO
+                    NbrCnt := NbrCnt + BITAND(Above, #001b) + BITAND(Here, #001b) + BITAND(Below, #001b);
+                    Above := BITSR(Above);
+                    Here := BITSR(Here);
+                    Below := BITSR(Below);
+                END;
 
-            
-            IF (BITAND(Row, #010b) == #010b) THEN
-                IF 2 <= NbrCnt <= 3 THEN
-                    //PRINT ("BIT " + Idx + ", " + ColIdx + " LIVES");
-                    Bit := 1;
+                
+                IF (BITAND(Row, #010b) == #010b) THEN
+                    IF 2 <= NbrCnt <= 3 THEN
+                        //PRINT ("BIT " + Idx + ", " + ColIdx + " LIVES");
+                        Bit := 1;
+                    ELSE
+                        //PRINT ("BIT " + Idx + ", " + ColIdx + " DIES");
+                        Bit := 0;
+                    END
                 ELSE
-                    //PRINT ("BIT " + Idx + ", " + ColIdx + " DIES");
-                    Bit := 0;
-                END
-            ELSE
-                // Process a bit to see if it turns on
-                // Any dead cell with three live neighbours becomes a live cell.
-                IF 3 == NbrCnt THEN
-                    PRINT ("BIT Row " + Idx + ", Column " + ColIdx + " Activates");
-                    Bit := 1;
-                END
-            END; 
-            //PRINT("Row " + Idx + " is " + Row);
-            
-            RowAbove := BITSR(RowAbove);
-            Row := BITSR(Row);
-            RowBelow := BITSR(RowBelow);
+                    // Process a bit to see if it turns on
+                    // Any dead cell with three live neighbours becomes a live cell.
+                    IF 3 == NbrCnt THEN
+                        PRINT ("BIT Row " + Idx + ", Column " + ColIdx + " Activates");
+                        Bit := 1;
+                    END
+                END; 
+                //PRINT("Row " + Idx + " is " + Row);
+                
+                RowAbove := BITSR(RowAbove);
+                Row := BITSR(Row);
+                RowBelow := BITSR(RowBelow);
 
-            //PRINT ("Bit " + Bit);
+                //PRINT ("Bit " + Bit);
+                
+            END; // If
+            
             GenTwoList(Idx) := BITSL(BITOR(GenTwoList(Idx), Bit),1);
-            Bit := 0;
             ColIdx := ColIdx - 1;
+            Bit := 0;
         END; // While
     END; // For
 
