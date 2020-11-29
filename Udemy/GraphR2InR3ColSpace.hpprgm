@@ -1,0 +1,24 @@
+// Program that takes a 3x2  matrix and graphs the R2 spanning column space that is embedded in R3. 
+// This program starts the 3d Graphing app (copied version called ColSpace) and displays its planes in FZ1 and FZ2
+EXPORT GraphR2InR3ColSpace(ColMat)
+BEGIN
+
+LOCAL ColMatSiz;
+
+ColMatSiz := SIZE(ColMat);
+IF ColMatSiz(1) == 3 AND Rank(ColMat) == 2 THEN
+  LOCAL rrefMat;
+
+  rrefMat := RREF(TRN(ColMat)); 
+  ColSpace.FZ1:= rrefMat(1,3) + "*X + " + rrefMat(2,3) + "*Y";
+  ColSpace.FZ2:=0;
+
+  STARTAPP("ColSPace");
+  // Ensure that FZ1 and FZ2 are enabled for graphing
+  CHECK(1);
+  CHECK(2);
+
+  // Start the plot view to show FZ1 and FZ2
+  STARTVIEW(1);
+END;
+END;
