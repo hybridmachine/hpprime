@@ -11,7 +11,7 @@ IF ColMatSiz(1) == 3 AND Rank(ColMat) == 2 THEN
 
   rrefMat := RREF(TRN(ColMat)); 
   ColSpace.FZ1:= rrefMat(1,3) + "*X + " + rrefMat(2,3) + "*Y";
-  ColSpace.FZ2:=0;
+  ColSpace.FZ2:=0; // Plane that spans the X and Y coordinates
 
   STARTAPP("ColSPace");
   // Ensure that FZ1 and FZ2 are enabled for graphing

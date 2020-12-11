@@ -1,0 +1,57 @@
+#pragma mode( separator(.,;) integer(h64) )
+// This program is an implementation of the MatLab coding challenge Matrix Shifting Effect on Determinent
+//
+// Generate a square random matrix (say 20x20)
+// impose a linear dependence (reduce rank matrix)
+// "shift" the matrix (0 -> 0.1 * identity matrix). 
+// compute the abs(determinent) of the shifted matrix
+// repeat the above 1000 times for each shift value, take an average of the
+// abs(determinent)
+// plot the avg abs det vs shift amount 
+
+EXPORT PlotShiftVSDet()
+BEGIN
+    LOCAL MatSize;
+    LOCAL ShiftIdx;
+
+    LOCAL ShiftList;
+    LOCAL ShiftListSz;
+    LOCAL DeterminentAvg;
+
+    LOCAL DetList;
+
+    // Make a linear spaced list (similar to linspace in matlab) of shift amounts
+    ShiftList := MAKELIST(X,X,0,0.1,0.005);    
+    ShiftListSz := SIZE(ShiftList);
+
+    // Make a 0's list the same size as the shift list
+    DetList := MAKELIST(0,X,1,ShiftListSz);
+    MatSize := 5;
+
+    FOR ShiftIdx FROM 1 TO ShiftListSz DO
+        LOCAL ShiftMat;
+        LOCAL RunIdx; 
+        
+        ShiftMat := IDENMAT(MatSize) * ShiftList(ShiftIdx);
+        DeterminentAvg := 0;
+
+        FOR RunIdx FROM 1 TO 200 DO        
+            RANDMAT(M1,MatSize,MatSize);
+
+            // Reduce the rank of the matrix by copying column 1 to column 2
+            M1 := REPLACE(M1,{1,2},M1({{1,1},{MatSize,1}}));
+
+            M1 := M1 + ShiftMat;
+            DeterminentAvg := DeterminentAvg + ABS(DET(M1));   
+        END;
+
+        PRINT(RunIdx);
+        DeterminentAvg := (DeterminentAvg / RunIdx); // Take the mean of the determinent values
+        DetList(ShiftIdx) := DeterminentAvg;
+
+    END; // FOR ShiftAmt...
+
+    Statistics_2Var.C1 := ShiftList;
+    Statistics_2Var.C2 := DetList;
+
+END; // End PlotShiftVSDet
