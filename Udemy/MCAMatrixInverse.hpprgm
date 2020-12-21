@@ -106,8 +106,8 @@ BEGIN
         
         CofactorsMatrix := CofactorsMatrix .* CoFSignMatrixes; 
         InverseMatrix := TRN(CofactorsMatrix) * 1/Determinant;
-        PRINT(InverseMatrix);
-        PRINT(ROUND(matrixToInvert * InverseMatrix, 1));
+
+        RETURN(InverseMatrix);
     ELSE
         RETURN("ERROR: Matrix must be square");
     END;
