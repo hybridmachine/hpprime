@@ -1,0 +1,116 @@
+#pragma mode( separator(.,;) integer(h64) )
+// Implementation of the matrix inverse using the MCA algorithm
+//
+// Calculate the Minors Matrix by excluding the row/column for the value being calculated
+// Then take the determinant of the sub matrix. That value becomes the value of the position
+// being calculated in the minors matrix
+// For convenience build the Cofactors sign matrix at the same time
+
+DeleteRow(SourceMatrix, RowIdx)
+BEGIN
+    LOCAL ReturnMatrix;
+    LOCAL RowCount;
+    LOCAL ColCount;
+    LOCAL MatSize;
+    LOCAL Row;
+    LOCAL TargetRow;
+
+    MatSize := SIZE(SourceMatrix);
+    RowCount := MatSize(1) - 1;
+    ColCount := MatSize(2);
+
+    ReturnMatrix := MAKEMAT(0,RowCount, ColCount);
+
+    TargetRow := 1;
+    FOR Row FROM 1 To MatSize(1) DO
+        If Row <> RowIdx THEN
+            ReturnMatrix(TargetRow) := SourceMatrix(Row);
+            TargetRow := TargetRow + 1;
+        END; 
+    END; 
+
+    RETURN ReturnMatrix;
+END;
+
+DeleteCol(SourceMatrix, ColIdx)
+BEGIN
+    LOCAL ReturnMatrix;
+    LOCAL RowCount;
+    LOCAL ColCount;
+    LOCAL MatSize;
+    LOCAL Col;
+    Local TargetCol;
+
+    MatSize := SIZE(SourceMatrix);
+    RowCount := MatSize(1);
+    ColCount := MatSize(2) - 1;
+
+    ReturnMatrix := MAKEMAT(0,RowCount, ColCount);
+
+    TargetCol := 1;
+    FOR Col FROM 1 To MatSize(2) DO
+        If Col <> ColIdx THEN
+            LOCAL Row;
+            For Row FROM 1 to MatSize(1) DO
+                ReturnMatrix(Row,TargetCol) := SourceMatrix(Row,Col);
+            END;
+            TargetCol := TargetCol + 1;
+        END; 
+    END; 
+
+    RETURN ReturnMatrix;
+END;
+
+EXPORT MCAInverse(matrixToInvert)
+BEGIN
+    LOCAL CoFSignMatrixes;
+    LOCAL MinorsMatrix;
+    LOCAL CofactorsMatrix;
+    LOCAL TempMatrix;
+    LOCAL SignValue;
+    LOCAL Determinant;
+    LOCAL InverseMatrix;
+
+    LOCAL MatSize;
+    LOCAL Row;
+    LOCAL Col;
+
+    MatSize := SIZE(matrixToInvert);
+
+    // Matrix first has to be square
+    IF MatSize(1) == MatSize(2) THEN
+        Determinant := DET(matrixToInvert);
+        IF Determinant == 0 THEN
+            RETURN("ERROR: Matrix must be full rank");
+        END;
+
+        MinorsMatrix := MAKEMAT(0,MatSize(1),MatSize(1));
+        CoFSignMatrixes := MAKEMAT(0,MatSize(1),MatSize(1));
+        CofactorsMatrix := MAKEMAT(0,MatSize(1), MatSize(1));
+        SignValue := 1;
+        Print();
+
+        FOR Row FROM 1 TO MatSize(1) DO
+            FOR Col FROM 1 TO MatSize(2) DO
+                LOCAL SubMatrix;
+                CoFSignMatrixes(Row,Col) := SignValue;
+                SignValue := -1 * SignValue; // Flip sign for next position
+
+                SubMatrix := DeleteRow(matrixToInvert, Row);
+                SubMatrix := DeleteCol(SubMatrix, Col);
+                
+                CofactorsMatrix(Row,Col) := DET(SubMatrix);
+            END; // Col
+        END; // Row
+ 
+        
+        CofactorsMatrix := CofactorsMatrix .* CoFSignMatrixes; 
+        InverseMatrix := TRN(CofactorsMatrix) * 1/Determinant;
+        PRINT(InverseMatrix);
+        PRINT(ROUND(matrixToInvert * InverseMatrix, 1));
+    ELSE
+        RETURN("ERROR: Matrix must be square");
+    END;
+END; // MCAInverse
+
+
