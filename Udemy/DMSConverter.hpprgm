@@ -1,0 +1,26 @@
+#pragma mode( separator(.,;) integer(h64) )
+// Implementation of Degree to Degree Minutes Seconds (DMS) string and DMS string to Degrees (float)
+
+EXPORT DegreesToDMS(degrees)
+BEGIN
+    LOCAL Degrees;
+    LOCAL Minutes;
+    LOCAL Seconds;
+    Local DegreesFraction;
+
+    Degrees := IP(degrees);
+    DegreesFraction := FP(degrees);
+    Minutes := IP(DegreesFraction * 60); // 60 minutes / degrees
+    Seconds := FP(DegreesFraction * 60) * 60; // 60 seconds / minute
+
+    L1 := {Degrees, Minutes, Seconds};
+    RETURN(""+Degrees+"°"+Minutes+"'"+Seconds+"''");
+END;
+
+EXPORT RadiansToDMS(radians)
+BEGIN
+    LOCAL Degrees;
+
+    Degrees := radians * (180/π);
+    DegreesToDMS(Degrees);
+END;

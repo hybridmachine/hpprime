@@ -1,0 +1,37 @@
+#pragma mode( separator(.,;) integer(h64) )
+// Decompose a vector 1 parallel and perpenducular components of vector 2
+
+EXPORT Decompose(vector1, vector2)
+BEGIN
+    LOCAL V1_PARALLEL_V2;
+    LOCAL V1_PERPENDICULAR_V2;
+    LOCAL GA;
+    LOCAL GB;
+    LOCAL GVarName;
+    LOCAL GVarDef;
+    LOCAL GVarVal;
+    LOCAL GVarColor;
+
+    GVarName:=2;
+    GVarDef:=3;
+    GVarVal:=4;
+    GVarColor:=5;
+
+    PRINT();
+
+    V1_PARALLEL_V2 := (DOT(vector1,vector2)/DOT(vector2,vector2)) * vector2;
+    V1_PERPENDICULAR_V2 := vector1 - V1_PARALLEL_V2;
+
+    GA := "segment(point(0,0), point(" + vector1(1) + "," + vector1(2) + "))";
+    GB := "segment(point(0,0), point(" + vector2(1) + "," + vector2(2) + "))";
+    PRINT(GA);
+    PRINT(GB);
+
+    // Plot the vectors
+    // {"GAA",segment(point(0,0),point(1,5)),segment(point(0,0),point(1,5)),#FF000000h,1,4,0,0,1,{},{}}
+    Geometry.DelInstruction;
+    Geometry.Instruction(0,1):={"GAA",GA,GA,#0000FF00h,1,4,0,0,1,{},{}};
+    Geometry.Instruction(0,1):={"GBB",GB,GB,#00FF0000h,1,4,0,0,1,{},{}};
+
+    RETURN({V1_PARALLEL_V2, V1_PERPENDICULAR_V2});
+END;
